@@ -15,23 +15,19 @@ export const HelloWorld: React.FC = () => {
   const [progressState, setProgressState] = useState<boolean>(false);
   const fileInput = React.createRef<HTMLInputElement>();
 
-  function sleep(time: number) {
-    return new Promise((resolve) => setTimeout(resolve, time));
-  }
-
   async function addRecords(records) {
-    var chunk = function (arr: any[], num: number) {
-      num = num * 1 || 1;
-      var ret: any[] = [];
-      arr.forEach(function (item, i) {
-        if (i % num === 0) {
-          ret.push([]);
-        }
-        ret[ret.length - 1].push(item);
-      });
-      console.log(ret);
-      return ret;
-    };
+    // var chunk = function (arr: any[], num: number) {
+    //   num = num * 1 || 1;
+    //   var ret: any[] = [];
+    //   arr.forEach(function (item, i) {
+    //     if (i % num === 0) {
+    //       ret.push([]);
+    //     }
+    //     ret[ret.length - 1].push(item);
+    //   });
+    //   console.log(ret);
+    //   return ret;
+    // };
     if (!datasheet) {
       return;
     }
