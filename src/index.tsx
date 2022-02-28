@@ -34,7 +34,11 @@ export const HelloWorld: React.FC = () => {
     const permission = datasheet.checkPermissionsForAddRecord(records);
     if (permission.acceptable) {
       console.log(records.length);
-      datasheet.addRecords(records);
+      try {
+        datasheet.addRecords(records);
+      } catch (error) {
+        alert(error);
+      }
       // if (records.length > 5000) {
       //   chunk(records, 5000).forEach(async (recordList, index) => {
       //     // setTimeout(() => {
@@ -156,18 +160,16 @@ export const HelloWorld: React.FC = () => {
               //找出维格表每个字段在导入的文件里是什么位置
               const index: number = header.indexOf(field.name);
               if (index != -1) {
-                //如果原始数据为空，则写入 null
-                if (!record[index]) {
-                  valuesMap[field.id] = null;
-                } else if (field.isComputed) {
+                if (field.isComputed) {
                   //计算字段处理
-                  //console.log("计算字段不能写入：", field.name);
+                  console.log("计算字段不能写入：", [field.name, field.id]);
                 } else if (
                   field.type === "Attachment" ||
-                  field.type === "Member"
+                  field.type === "Member" ||
+                  field.type === "MagicLink"
                 ) {
                   //附件和成员类型字段处理
-                  //console.log("特殊字段不能写入：", field.name);
+                  console.log("特殊字段不能写入：", [field.name, field.id]);
                 } else if (field.type === "DateTime") {
                   //日期类型字段处理
                   valuesMap[field.id] = format(record[index]);
@@ -188,6 +190,9 @@ export const HelloWorld: React.FC = () => {
                   //多选类型字段处理
                   // console.log("MultiSelect", String(record[index]).split(","));
                   valuesMap[field.id] = String(record[index]).split(",");
+                } else if (!record[index]) {
+                  //如果原始数据为空，则写入 null
+                  valuesMap[field.id] = null;
                 } else {
                   //默认存储字符串
                   valuesMap[field.id] = String(record[index]);
@@ -196,7 +201,7 @@ export const HelloWorld: React.FC = () => {
             });
             records.push({ valuesMap });
           });
-          // console.log(records);
+          console.log(records);
           addRecords(records);
         } catch (e) {
           console.log("文件类型不正确", e);
