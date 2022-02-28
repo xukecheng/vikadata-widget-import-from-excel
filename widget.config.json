@@ -1,0 +1,16 @@
+{
+  "packageId": "wpktBHZohrjoU",
+  "spaceId": "spczdmQDfBAn5",
+  "entry": "./src/index.tsx",
+  "name": {
+    "zh-CN": "从 Excel 导入数据",
+    "en-US": "Import Data From Excel"
+  },
+  "icon": "./package_icon.png",
+  "cover": "./cover.png",
+  "authorIcon": "./author_icon.png",
+  "description": {
+    "zh-CN": "从 Excel 导入数据",
+    "en-US": "从 Excel 导入数据"
+  }
+}
