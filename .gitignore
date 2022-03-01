@@ -46,3 +46,7 @@ test.csv
 test.xls
 ~$test.xlsx
 widget.config.json.self
+widget.config.json.template
+template.xlsx
+~$template.xlsx
+widget.config.json_template

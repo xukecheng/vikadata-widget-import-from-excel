@@ -11,6 +11,6 @@
   "authorIcon": "./author_icon.png",
   "description": {
     "zh-CN": "从 Excel 导入数据",
-    "en-US": "从 Excel 导入数据"
+    "en-US": "Import Data From Excel"
   }
 }
