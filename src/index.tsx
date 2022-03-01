@@ -39,6 +39,7 @@ export const HelloWorld: React.FC = () => {
       } catch (error) {
         alert(error);
       }
+      // TODO: 解决大量数据的导入问题
       // if (records.length > 5000) {
       //   chunk(records, 5000).forEach(async (recordList, index) => {
       //     // setTimeout(() => {
@@ -56,7 +57,7 @@ export const HelloWorld: React.FC = () => {
     }
   }
 
-  //自定义格式化日期
+  // 自定义格式化日期
   function format(excelDate: any) {
     if (typeof excelDate === "number") {
       let step = new Date().getTimezoneOffset() <= 0 ? 25567 + 2 : 25567 + 1;
@@ -87,9 +88,9 @@ export const HelloWorld: React.FC = () => {
         seconds
       ).getTime();
     } else if (typeof excelDate === "string") {
-      //字符串需要是 2001/10/01 10:11:01
+      // 字符串需要是 2001/10/01 10:11:01
       excelDate = excelDate.substring(0, 19);
-      //必须把日期'-'转为'/'
+      // 必须把日期'-'转为'/'
       excelDate = excelDate.replace(/-/g, "/");
       const timestamp = new Date(excelDate).getTime();
       return timestamp;
@@ -126,10 +127,10 @@ export const HelloWorld: React.FC = () => {
             cellText: false,
             cellDates: false,
           });
-          //默认只读取第一张表;
+          // 默认只读取第一张表;
           const wsname = wb.SheetNames[0];
           const ws = wb.Sheets[wsname];
-          //利用 sheet_to_json 方法将 excel 转成 json 数据
+          // 利用 sheet_to_json 方法将 excel 转成 json 数据
           const data: any[] = XLSX.utils.sheet_to_json(ws, {
             header: 1,
             raw: true,
@@ -157,44 +158,44 @@ export const HelloWorld: React.FC = () => {
           data.forEach((record: any) => {
             const valuesMap = new Object();
             fields.map((field) => {
-              //找出维格表每个字段在导入的文件里是什么位置
+              // 找出维格表每个字段在导入的文件里是什么位置
               const index: number = header.indexOf(field.name);
               if (index != -1) {
                 if (field.isComputed) {
-                  //计算字段处理
+                  // 计算字段处理
                   console.log("计算字段不能写入：", [field.name, field.id]);
                 } else if (
                   field.type === "Attachment" ||
                   field.type === "Member" ||
                   field.type === "MagicLink"
                 ) {
-                  //附件和成员类型字段处理
+                  // 附件和成员类型字段处理
                   console.log("特殊字段不能写入：", [field.name, field.id]);
                 } else if (field.type === "DateTime") {
-                  //日期类型字段处理
+                  // 日期类型字段处理
                   valuesMap[field.id] = format(record[index]);
                 } else if (field.type === "Number") {
-                  //数字类型字段处理
+                  // 数字类型字段处理
                   try {
                     valuesMap[field.id] = parseInt(record[index]);
                   } catch (error) {
                     valuesMap[field.id] = null;
                   }
                 } else if (field.type === "Checkbox") {
-                  //勾选类型字段处理
+                  // 勾选类型字段处理
                   valuesMap[field.id] =
                     record[index] === 1 || record[index] === true
                       ? true
                       : false;
                 } else if (field.type === "MultiSelect") {
-                  //多选类型字段处理
+                  // 多选类型字段处理
                   // console.log("MultiSelect", String(record[index]).split(","));
                   valuesMap[field.id] = String(record[index]).split(",");
                 } else if (!record[index]) {
-                  //如果原始数据为空，则写入 null
+                  // 如果原始数据为空，则写入 null
                   valuesMap[field.id] = null;
                 } else {
-                  //默认存储字符串
+                  // 默认存储字符串
                   valuesMap[field.id] = String(record[index]);
                 }
               }
@@ -213,7 +214,7 @@ export const HelloWorld: React.FC = () => {
       };
     }
 
-    //清空选择的文件
+    // 清空选择的文件
     fileReader.onloadend = (event) => {
       if (fileInput.current) {
         fileInput.current.value = "";
