@@ -15,44 +15,45 @@ export const HelloWorld: React.FC = () => {
   const [progressState, setProgressState] = useState<boolean>(false);
   const fileInput = React.createRef<HTMLInputElement>();
 
-  async function addRecords(records) {
-    // var chunk = function (arr: any[], num: number) {
-    //   num = num * 1 || 1;
-    //   var ret: any[] = [];
-    //   arr.forEach(function (item, i) {
-    //     if (i % num === 0) {
-    //       ret.push([]);
-    //     }
-    //     ret[ret.length - 1].push(item);
-    //   });
-    //   console.log(ret);
-    //   return ret;
-    // };
+  function addRecords(records: any[]) {
+    var chunk = function (arr: any[], num: number) {
+      num = num * 1 || 1;
+      var ret: any[] = [];
+      arr.forEach(function (item, i) {
+        if (i % num === 0) {
+          ret.push([]);
+        }
+        ret[ret.length - 1].push(item);
+      });
+      console.log(ret);
+      return ret;
+    };
     if (!datasheet) {
       return;
     }
     const permission = datasheet.checkPermissionsForAddRecord(records);
     if (permission.acceptable) {
       console.log(records.length);
-      try {
-        datasheet.addRecords(records);
-      } catch (error) {
-        alert(error);
-      }
-      // TODO: 解决大量数据的导入问题
-      // if (records.length > 5000) {
-      //   chunk(records, 5000).forEach(async (recordList, index) => {
-      //     // setTimeout(() => {
-      //     //   console.log("插入5000条-" + index);
-      //     //   datasheet.addRecords(recordList);
-      //     // }, index * 100);
-      //     await sleep(500);
-      //     console.log("插入5000条-" + index);
-      //     datasheet.addRecords(recordList);
-      //   });
-      // } else {
+      // try {
       //   datasheet.addRecords(records);
+      // } catch (error) {
+      //   alert(error);
       // }
+      // TODO: 解决大量数据的导入问题
+      if (records.length > 5000) {
+        chunk(records, 5000).forEach((recordList, index) => {
+          setTimeout(async () => {
+            console.log("插入5000条-" + index);
+            datasheet.addRecords(recordList);
+          }, index * 3500);
+        });
+        setTimeout(async () => {
+          console.log("完成大量数据导入");
+          setProgressState(false);
+        }, (records.length / 5000) * 3500);
+      } else {
+        datasheet.addRecords(records).then((value) => setProgressState(false));
+      }
       return;
     }
   }
@@ -95,7 +96,7 @@ export const HelloWorld: React.FC = () => {
       const timestamp = new Date(excelDate).getTime();
       return timestamp;
     } else {
-      alert("文件中含有错误的日期数据");
+      console.log("文件中含有错误的日期数据", excelDate);
       return null;
     }
   }
@@ -210,7 +211,6 @@ export const HelloWorld: React.FC = () => {
           setProgressState(false);
           return;
         }
-        setProgressState(false);
       };
     }
 

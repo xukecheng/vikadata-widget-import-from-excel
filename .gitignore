@@ -45,8 +45,8 @@ test.xlsx
 test.csv
 test.xls
 ~$test.xlsx
-widget.config.json.self
-widget.config.json.template
+widget.config.json_self
+widget.config.json_integration
 template.xlsx
 ~$template.xlsx
 widget.config.json_template
