@@ -6,7 +6,9 @@
 
 导入的文件需要和被导入的维格表内的列标题一致，示例如下：
 ![vika_field.png](https://oss.xukecheng.tech/image/png/1646017424.png)
-![excel_field.png](https://oss.xukecheng.tech/image/png/1646017522.png)
+![excel_field.png](https://oss.xukecheng.tech/image/png/1646709258.png)
+
+模板示例：https://vika.cn/share/shrzWKKTvijSdqyE0EAlB/fodFCh1bgBuhe
 
 需要注意的是：
 - 不支持导入计算字段，“计算字段”的意思是，不允许用户主动写入值的字段类型。（比如：自增数字、公式、神奇引用、修改时间、创建时间、修改人、创建人）

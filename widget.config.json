@@ -10,7 +10,7 @@
   "cover": "./cover.png",
   "authorIcon": "./author_icon.png",
   "description": {
-    "zh-CN": "从 Excel 导入数据",
-    "en-US": "Import Data From Excel"
+    "zh-CN": "支持从 .xlsx .xls .csv 文件中获取数据，并追加导入到当前维格表中",
+    "en-US": "Support data from .xlsx .xls .csv files, and add to the import to the current table"
   }
 }
