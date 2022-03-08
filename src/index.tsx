@@ -55,6 +55,9 @@ export const HelloWorld: React.FC = () => {
         datasheet.addRecords(records).then((value) => setProgressState(false));
       }
       return;
+    } else {
+      alert(permission.message);
+      setProgressState(false);
     }
   }
 
