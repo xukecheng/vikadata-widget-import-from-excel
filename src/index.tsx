@@ -41,17 +41,17 @@ export const HelloWorld: React.FC = () => {
       //   alert(error);
       // }
       // TODO: 解决大量数据的导入问题
-      if (records.length > 5000) {
-        chunk(records, 2000).forEach((recordList, index) => {
+      if (records.length > 2000) {
+        chunk(records, 1000).forEach((recordList, index) => {
           setTimeout(async () => {
-            console.log("插入2000条-" + index);
+            console.log("插入1000条-" + index);
             datasheet.addRecords(recordList);
           }, index * 5000);
         });
         setTimeout(async () => {
           console.log("完成大量数据导入");
           setProgressState(false);
-        }, (records.length / 2000) * 5000);
+        }, (records.length / 1000) * 5000);
       } else {
         datasheet.addRecords(records).then((value) => setProgressState(false));
       }
