@@ -9,7 +9,8 @@
   "icon": "./package_icon.png",
   "cover": "./cover.png",
   "authorIcon": "./author_icon.png",
-  "authorLink": "https://bbs.vika.cn/article/144",
+  "authorName": "vika实验室",
+  "authorLink": "vika.cn",
   "authorEmail": "xukecheng@vikadata.com",
   "sandbox": true,
   "description": {
