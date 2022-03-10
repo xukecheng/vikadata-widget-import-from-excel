@@ -4,7 +4,7 @@
 
 ## 📄 使用指南
 
-导入的文件需要和被导入的维格表内的列标题一致，示例如下：
+导入文件的首列标题需要和被导入的维格表内的列标题一致，示例如下：
 ![vika_field.png](https://oss.xukecheng.tech/image/png/1646017424.png)
 ![excel_field.png](https://oss.xukecheng.tech/image/png/1646709258.png)
 
