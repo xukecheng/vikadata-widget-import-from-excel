@@ -7,7 +7,6 @@ import {
 } from "@vikadata/widget-sdk";
 import * as XLSX from "xlsx";
 import { Loading, Button } from "@vikadata/components";
-import { execPath } from "process";
 
 export const HelloWorld: React.FC = () => {
   const viewId = useActiveViewId();
@@ -46,12 +45,12 @@ export const HelloWorld: React.FC = () => {
           setTimeout(async () => {
             console.log("插入1000条-" + index);
             datasheet.addRecords(recordList);
-          }, index * 5000);
+          }, index * 5500);
         });
         setTimeout(async () => {
           console.log("完成大量数据导入");
           setProgressState(false);
-        }, (records.length / 1000) * 5000);
+        }, (records.length / 1000) * 5500);
       } else {
         datasheet.addRecords(records).then((value) => setProgressState(false));
       }
@@ -158,81 +157,99 @@ export const HelloWorld: React.FC = () => {
           console.log("导入文件的字段：", header);
 
           data.shift();
-          console.log("导入文件的原始数据：", data);
+          // console.log("导入文件的原始数据：", data);
 
           const newData: any[] = data.filter(function (s: any[]) {
             return s.length != 0 && s;
           });
+          const newDataNum = newData.length;
 
-          newData.forEach((record: any[]) => {
-            const valuesMap = new Object();
-            fields.map((field) => {
-              // 找出维格表每个字段在导入的文件里是什么位置
-              const index: number = header.indexOf(field.name);
-              if (index != -1) {
-                if (field.isComputed) {
-                  // 计算字段处理
-                  console.log("计算字段不能写入：", [field.name, field.id]);
-                } else if (
-                  field.type === "Attachment" ||
-                  field.type === "Member" ||
-                  field.type === "MagicLink"
-                ) {
-                  // 附件和成员类型字段处理
-                  console.log("特殊字段不能写入：", [field.name, field.id]);
-                } else if (field.type === "DateTime") {
-                  // 日期类型字段处理
-                  valuesMap[field.id] = format(record[index]);
-                } else if (field.type === "Number") {
-                  // 数字类型字段处理
-                  try {
-                    valuesMap[field.id] = Number(record[index]);
-                  } catch (error) {
-                    valuesMap[field.id] = null;
-                  }
-                } else if (field.type === "Checkbox") {
-                  // 勾选类型字段处理
-                  valuesMap[field.id] =
-                    record[index] === 1 || record[index] === true
-                      ? true
-                      : false;
-                } else if (field.type === "MultiSelect") {
-                  // 多选类型字段处理
-                  // console.log("MultiSelect", String(record[index]).split(","));
-                  valuesMap[field.id] = String(record[index]).split(",");
-                } else if (field.type === "Currency") {
-                  // 避免源数据中含有货币符号
-                  if (typeof record[index] != "number") {
+          let bigDataWarning: Boolean = true;
+
+          if (newDataNum > 50000) {
+            alert("超出表格行数上限");
+            setProgressState(false);
+            return;
+          } else if (newDataNum > 10000) {
+            bigDataWarning = confirm(
+              "请注意：当前导入的数据量较大，同步过程中容易导致维格表出现卡顿、同步慢等情况，情况程度视设备及网络情况而定"
+            );
+          }
+
+          if (bigDataWarning) {
+            newData.forEach((record: any[]) => {
+              const valuesMap = new Object();
+              fields.map((field) => {
+                // 找出维格表每个字段在导入的文件里是什么位置
+                const index: number = header.indexOf(field.name);
+                if (index != -1) {
+                  if (field.isComputed) {
+                    // 计算字段处理
+                    console.log("计算字段不能写入：", [field.name, field.id]);
+                  } else if (
+                    field.type === "Attachment" ||
+                    field.type === "Member" ||
+                    field.type === "MagicLink"
+                  ) {
+                    // 附件和成员类型字段处理
+                    console.log("特殊字段不能写入：", [field.name, field.id]);
+                  } else if (field.type === "DateTime") {
+                    // 日期类型字段处理
+                    valuesMap[field.id] = format(record[index]);
+                  } else if (field.type === "Number") {
+                    // 数字类型字段处理
                     try {
-                      var arr = record[index].match(/\d+(.\d+)?/g);
-                      console.log(arr);
-                      valuesMap[field.id] = Number(arr[0]);
+                      valuesMap[field.id] = Number(record[index]);
                     } catch (error) {
                       valuesMap[field.id] = null;
                     }
+                  } else if (field.type === "Checkbox") {
+                    // 勾选类型字段处理
+                    valuesMap[field.id] =
+                      record[index] === 1 || record[index] === true
+                        ? true
+                        : false;
+                  } else if (field.type === "MultiSelect") {
+                    // 多选类型字段处理
+                    // console.log("MultiSelect", String(record[index]).split(","));
+                    valuesMap[field.id] = String(record[index]).split(",");
+                  } else if (field.type === "Currency") {
+                    // 避免源数据中含有货币符号
+                    if (typeof record[index] != "number") {
+                      try {
+                        var arr = record[index].match(/\d+(.\d+)?/g);
+                        console.log(arr);
+                        valuesMap[field.id] = Number(arr[0]);
+                      } catch (error) {
+                        valuesMap[field.id] = null;
+                      }
+                    } else {
+                      valuesMap[field.id] = record[index];
+                    }
+                  } else if (!record[index]) {
+                    // 如果原始数据为空，则写入 null
+                    valuesMap[field.id] = null;
                   } else {
-                    valuesMap[field.id] = record[index];
+                    // 默认存储字符串
+                    valuesMap[field.id] = String(record[index]);
                   }
-                } else if (!record[index]) {
-                  // 如果原始数据为空，则写入 null
-                  valuesMap[field.id] = null;
-                } else {
-                  // 默认存储字符串
-                  valuesMap[field.id] = String(record[index]);
-                }
 
-                if (
-                  typeof valuesMap[field.id] === "number" &&
-                  isNaN(valuesMap[field.id])
-                ) {
-                  valuesMap[field.id] = null;
+                  if (
+                    typeof valuesMap[field.id] === "number" &&
+                    isNaN(valuesMap[field.id])
+                  ) {
+                    valuesMap[field.id] = null;
+                  }
                 }
-              }
+              });
+              records.push({ valuesMap });
             });
-            records.push({ valuesMap });
-          });
-          console.log(records);
-          addRecords(records);
+            console.log(records);
+            addRecords(records);
+          } else {
+            setProgressState(false);
+            return;
+          }
         } catch (e) {
           console.log(e);
           alert(e);
