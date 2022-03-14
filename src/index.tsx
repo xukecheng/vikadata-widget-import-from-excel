@@ -218,8 +218,23 @@ export const HelloWorld: React.FC = () => {
                     if (typeof record[index] != "number") {
                       try {
                         var arr = record[index].match(/\d+(.\d+)?/g);
-                        console.log(arr);
                         valuesMap[field.id] = Number(arr[0]);
+                      } catch (error) {
+                        valuesMap[field.id] = null;
+                      }
+                    } else {
+                      valuesMap[field.id] = record[index];
+                    }
+                  } else if (field.type === "Percent") {
+                    // 百分比类型字段处理
+                    if (typeof record[index] != "number") {
+                      try {
+                        var arr = record[index].match(/\d+(.\d+)?/g);
+                        if (record[index].match("%")) {
+                          valuesMap[field.id] = Number(arr[0]);
+                        } else {
+                          valuesMap[field.id] = Number(arr[0]) * 100;
+                        }
                       } catch (error) {
                         valuesMap[field.id] = null;
                       }
@@ -244,7 +259,7 @@ export const HelloWorld: React.FC = () => {
               });
               records.push({ valuesMap });
             });
-            console.log(records);
+            // console.log(records);
             addRecords(records);
           } else {
             setProgressState(false);
