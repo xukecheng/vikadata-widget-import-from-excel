@@ -164,97 +164,70 @@ export const HelloWorld: React.FC = () => {
           });
           const newDataNum = newData.length;
 
-          let bigDataWarning: Boolean = true;
-
-          if (newDataNum > 50000) {
-            alert("超出表格行数上限");
-            setProgressState(false);
-            return;
-          } else if (newDataNum > 10000) {
-            bigDataWarning = confirm(
-              "请注意：当前导入的数据量较大，同步过程中容易导致维格表出现卡顿、同步慢等情况，情况程度视设备及网络情况而定"
-            );
-          }
+          let bigDataWarning: Boolean =
+            newDataNum > 10000
+              ? confirm(
+                  "请注意：当前导入的数据量较大，同步过程中容易导致维格表出现卡顿、同步慢等情况，情况程度视设备及网络情况而定"
+                )
+              : true;
 
           if (bigDataWarning) {
+            // 定义数据处理方式
+            const handleDateTimeType = (data) => format(data);
+            const handleCheckboxType = (data) =>
+              data === 1 || data === true ? true : false;
+            const handleMultiSelectType = () => String(data).split(",");
+            const handleCurrencyType = (data) => {
+              // 避免源数据中含有货币符号
+              return typeof data != "number"
+                ? Number(data.match(/\d+(.\d+)?/g)[0])
+                : data;
+            };
+            const handlePercentType = (data) => {
+              // 百分比类型字段处理
+              return typeof data === "number"
+                ? data
+                : data.match("%")
+                ? Number(data.match(/\d+(.\d+)?/g)[0])
+                : Number(data.match(/\d+(.\d+)?/g)[0]) * 100;
+            };
+
+            // 定义数据处理映射
+            let fieldHandle = {
+              DateTime: handleDateTimeType,
+              Number: Number,
+              Checkbox: handleCheckboxType,
+              MultiSelect: handleMultiSelectType,
+              Currency: handleCurrencyType,
+              Percent: handlePercentType,
+            };
+
             newData.forEach((record: any[]) => {
               const valuesMap = new Object();
+
               fields.map((field) => {
+                const specialType = ["Attachment", "Member", "MagicLink"];
+
+                if (field.isComputed || specialType.includes(field.type))
+                  return;
+
                 // 找出维格表每个字段在导入的文件里是什么位置
                 const index: number = header.indexOf(field.name);
-                if (index != -1) {
-                  if (field.isComputed) {
-                    // 计算字段处理
-                    console.log("计算字段不能写入：", [field.name, field.id]);
-                  } else if (
-                    field.type === "Attachment" ||
-                    field.type === "Member" ||
-                    field.type === "MagicLink"
-                  ) {
-                    // 附件和成员类型字段处理
-                    console.log("特殊字段不能写入：", [field.name, field.id]);
-                  } else if (field.type === "DateTime") {
-                    // 日期类型字段处理
-                    valuesMap[field.id] = format(record[index]);
-                  } else if (field.type === "Number") {
-                    // 数字类型字段处理
-                    try {
-                      valuesMap[field.id] = Number(record[index]);
-                    } catch (error) {
-                      valuesMap[field.id] = null;
-                    }
-                  } else if (field.type === "Checkbox") {
-                    // 勾选类型字段处理
-                    valuesMap[field.id] =
-                      record[index] === 1 || record[index] === true
-                        ? true
-                        : false;
-                  } else if (field.type === "MultiSelect") {
-                    // 多选类型字段处理
-                    // console.log("MultiSelect", String(record[index]).split(","));
-                    valuesMap[field.id] = String(record[index]).split(",");
-                  } else if (field.type === "Currency") {
-                    // 避免源数据中含有货币符号
-                    if (typeof record[index] != "number") {
-                      try {
-                        var arr = record[index].match(/\d+(.\d+)?/g);
-                        valuesMap[field.id] = Number(arr[0]);
-                      } catch (error) {
-                        valuesMap[field.id] = null;
-                      }
-                    } else {
-                      valuesMap[field.id] = record[index];
-                    }
-                  } else if (field.type === "Percent") {
-                    // 百分比类型字段处理
-                    if (typeof record[index] != "number") {
-                      try {
-                        var arr = record[index].match(/\d+(.\d+)?/g);
-                        if (record[index].match("%")) {
-                          valuesMap[field.id] = Number(arr[0]);
-                        } else {
-                          valuesMap[field.id] = Number(arr[0]) * 100;
-                        }
-                      } catch (error) {
-                        valuesMap[field.id] = null;
-                      }
-                    } else {
-                      valuesMap[field.id] = record[index];
-                    }
-                  } else if (!record[index]) {
-                    // 如果原始数据为空，则写入 null
-                    valuesMap[field.id] = null;
-                  } else {
-                    // 默认存储字符串
-                    valuesMap[field.id] = String(record[index]);
-                  }
 
-                  if (
-                    typeof valuesMap[field.id] === "number" &&
-                    isNaN(valuesMap[field.id])
-                  ) {
-                    valuesMap[field.id] = null;
+                if (index === -1) return;
+                try {
+                  let handleType = fieldHandle[field.type];
+                  var parseData = !record[index]
+                    ? null
+                    : field.type in fieldHandle
+                    ? handleType(record[index])
+                    : String(record[index]);
+                  if (typeof parseData === "number" && isNaN(parseData)) {
+                    parseData = null;
                   }
+                  valuesMap[field.id] = parseData;
+                } catch (error) {
+                  valuesMap[field.id] = null;
                 }
               });
               records.push({ valuesMap });
