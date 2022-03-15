@@ -173,17 +173,17 @@ export const HelloWorld: React.FC = () => {
 
           if (bigDataWarning) {
             // 定义数据处理方式
-            const handleDateTimeType = (data) => format(data);
-            const handleCheckboxType = (data) =>
+            const handleDateTimeType = (data: any) => format(data);
+            const handleCheckboxType = (data: any) =>
               data === 1 || data === true ? true : false;
             const handleMultiSelectType = () => String(data).split(",");
-            const handleCurrencyType = (data) => {
+            const handleCurrencyType = (data: any) => {
               // 避免源数据中含有货币符号
               return typeof data != "number"
                 ? Number(data.match(/\d+(.\d+)?/g)[0])
                 : data;
             };
-            const handlePercentType = (data) => {
+            const handlePercentType = (data: any) => {
               // 百分比类型字段处理
               return typeof data === "number"
                 ? data
@@ -289,6 +289,19 @@ export const HelloWorld: React.FC = () => {
           >
             仅支持 .xlsx .xls .csv
           </p>
+          <div
+            style={{
+              textAlign: "center",
+              fontSize: "12px",
+              color: "#7b67ee",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.open("https://bbs.vika.cn/article/144", "_blank");
+            }}
+          >
+            查看教程
+          </div>
         </div>
       )}
     </div>
