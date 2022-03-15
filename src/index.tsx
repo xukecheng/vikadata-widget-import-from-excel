@@ -109,7 +109,7 @@ export const HelloWorld: React.FC = () => {
   }
   const onImportExcel = (file) => {
     const mention = confirm(
-      "请注意：导入文件的列名需与维格表内的完全一致；不支持计算字段、成员字段、附件字段的导入"
+      "请注意：当前仅支持追加导入；导入文件的列名需与维格表内的完全一致；不支持计算字段、成员字段、附件字段的导入"
     );
 
     // 获取上传的文件对象
