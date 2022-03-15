@@ -217,7 +217,7 @@ export const HelloWorld: React.FC = () => {
                 if (index === -1) return;
                 try {
                   let handleType = fieldHandle[field.type];
-                  var parseData = !record[index]
+                  var parseData = !String(record[index])
                     ? null
                     : field.type in fieldHandle
                     ? handleType(record[index])
