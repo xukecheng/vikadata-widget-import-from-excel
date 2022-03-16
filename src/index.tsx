@@ -180,7 +180,7 @@ export const HelloWorld: React.FC = () => {
             const handleCurrencyType = (data: any) => {
               // 避免源数据中含有货币符号
               return typeof data != "number"
-                ? Number(data.match(/\d+(.\d+)?/g)[0])
+                ? Number(data.match(/-?[0-9]+(.[0-9]+)?/)[0])
                 : data;
             };
             const handlePercentType = (data: any) => {
@@ -188,18 +188,25 @@ export const HelloWorld: React.FC = () => {
               return typeof data === "number"
                 ? data
                 : data.match("%")
-                ? Number(data.match(/\d+(.\d+)?/g)[0])
-                : Number(data.match(/\d+(.\d+)?/g)[0]) * 100;
+                ? Number(data.match(/-?[0-9]+(.[0-9]+)?/)[0])
+                : Number(data.match(/-?[0-9]+(.[0-9]+)?/)[0]) * 100;
+            };
+            const handleNumberType = (data: any) => {
+              // 数字类型字段处理
+              return typeof data === "number"
+                ? data
+                : Number(data.match(/-?[0-9]+(.[0-9]+)?/)[0]);
             };
 
             // 定义数据处理映射
             let fieldHandle = {
               DateTime: handleDateTimeType,
-              Number: Number,
+              Number: handleNumberType,
               Checkbox: handleCheckboxType,
               MultiSelect: handleMultiSelectType,
               Currency: handleCurrencyType,
               Percent: handlePercentType,
+              Rating: handleNumberType,
             };
 
             newData.forEach((record: any[]) => {
