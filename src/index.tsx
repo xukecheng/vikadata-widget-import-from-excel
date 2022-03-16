@@ -157,7 +157,7 @@ export const HelloWorld: React.FC = () => {
           console.log("导入文件的字段：", header);
 
           data.shift();
-          // console.log("导入文件的原始数据：", data);
+          console.log("导入文件的原始数据：", data);
 
           const newData: any[] = data.filter(function (s: any[]) {
             return s.length != 0 && s;
@@ -224,11 +224,13 @@ export const HelloWorld: React.FC = () => {
                 if (index === -1) return;
                 try {
                   let handleType = fieldHandle[field.type];
-                  var parseData = !String(record[index])
-                    ? null
-                    : field.type in fieldHandle
-                    ? handleType(record[index])
-                    : String(record[index]);
+                  var parseData =
+                    !String(record[index]) ||
+                    String(record[index]) === "undefined"
+                      ? null
+                      : field.type in fieldHandle
+                      ? handleType(record[index])
+                      : String(record[index]);
                   if (typeof parseData === "number" && isNaN(parseData)) {
                     parseData = null;
                   }
@@ -239,7 +241,7 @@ export const HelloWorld: React.FC = () => {
               });
               records.push({ valuesMap });
             });
-            // console.log(records);
+            console.log(records);
             addRecords(records);
           } else {
             setProgressState(false);
