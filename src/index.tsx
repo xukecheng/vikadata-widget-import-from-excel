@@ -139,6 +139,7 @@ export const HelloWorld: React.FC = () => {
             header: 1,
             raw: true,
           });
+          // console.log("导入文件的原始数据：", data);
 
           const records: Object[] = [];
           const header: any[] = data[0];
@@ -147,6 +148,8 @@ export const HelloWorld: React.FC = () => {
             return header.indexOf(fieldName) > -1;
           });
 
+          // console.log("导入文件的字段：", header);
+
           if (intersection.length === 0) {
             alert("导入文件中没有和当前表格相同的列");
             setProgressState(false);
@@ -154,10 +157,8 @@ export const HelloWorld: React.FC = () => {
           }
 
           console.log("有交集的字段：", intersection);
-          console.log("导入文件的字段：", header);
 
           data.shift();
-          console.log("导入文件的原始数据：", data);
 
           const newData: any[] = data.filter(function (s: any[]) {
             return s.length != 0 && s;
@@ -176,7 +177,8 @@ export const HelloWorld: React.FC = () => {
             const handleDateTimeType = (data: any) => format(data);
             const handleCheckboxType = (data: any) =>
               data === 1 || data === true ? true : false;
-            const handleMultiSelectType = () => String(data).split(",");
+            const handleMultiSelectType = (data: any) =>
+              String(data).split(",");
             const handleCurrencyType = (data: any) => {
               // 避免源数据中含有货币符号
               return typeof data != "number"
@@ -241,7 +243,7 @@ export const HelloWorld: React.FC = () => {
               });
               records.push({ valuesMap });
             });
-            console.log(records);
+            // console.log(records);
             addRecords(records);
           } else {
             setProgressState(false);
