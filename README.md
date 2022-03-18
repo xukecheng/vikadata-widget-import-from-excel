@@ -1,12 +1,12 @@
-# 维格小程序 - Excel 导入
+# 维格小程序 - Excel追加导入
 
 可以从 .xlsx .csv .xls 文件追加导入更多数据
 
 ## 📄 使用指南
 
 导入文件的首列标题需要和被导入的维格表内的列标题一致，示例如下：
-![vika_field.png](https://oss.xukecheng.tech/image/png/1646017424.png)
-![excel_field.png](https://oss.xukecheng.tech/image/png/1646709258.png)
+![vika_field.png](https://s1.vika.cn/space/2022/03/18/6015eaf7c82a47d59b7bb716d9d30a85?attname=image.png)
+![excel_field.png](https://s1.vika.cn/space/2022/03/18/9e3aacadaa8f4703bb2517a6036213a9?attname=image.png)
 
 模板示例：https://vika.cn/share/shrzWKKTvijSdqyE0EAlB/fodFCh1bgBuhe
 

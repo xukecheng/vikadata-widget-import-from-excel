@@ -3,7 +3,7 @@
   "spaceId": "spczdmQDfBAn5",
   "entry": "./src/index.tsx",
   "name": {
-    "zh-CN": "Excel 导入",
+    "zh-CN": "Excel追加导入",
     "en-US": "Import Data From Excel"
   },
   "icon": "./package_icon.png",
