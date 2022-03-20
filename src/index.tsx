@@ -159,6 +159,11 @@ export const HelloWorld: React.FC = () => {
           console.log("有交集的字段：", intersection);
 
           data.shift();
+          if (data.length === 0) {
+            alert("导入文件的数据为空");
+            setProgressState(false);
+            return;
+          }
 
           const newData: any[] = data.filter(function (s: any[]) {
             return s.length != 0 && s;
