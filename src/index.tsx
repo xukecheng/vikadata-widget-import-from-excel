@@ -14,6 +14,7 @@ export const HelloWorld: React.FC = () => {
   const fields = useFields(viewId);
   const [progressState, setProgressState] = useState<boolean>(false);
   const fileInput = React.createRef<HTMLInputElement>();
+  const permission = datasheet?.checkPermissionsForAddRecord();
 
   function addRecords(records: any[]) {
     var chunk = function (arr: any[], num: number) {
@@ -31,8 +32,7 @@ export const HelloWorld: React.FC = () => {
     if (!datasheet) {
       return;
     }
-    const permission = datasheet.checkPermissionsForAddRecord(records);
-    if (permission.acceptable) {
+    if (permission?.acceptable) {
       console.log(records.length);
       // try {
       //   datasheet.addRecords(records);
@@ -56,7 +56,7 @@ export const HelloWorld: React.FC = () => {
       }
       return;
     } else {
-      alert(permission.message);
+      alert(permission?.message);
       setProgressState(false);
     }
   }
@@ -280,33 +280,55 @@ export const HelloWorld: React.FC = () => {
         height: "100%",
       }}
     >
-      {progressState ? (
-        <Loading />
+      {permission?.acceptable ? (
+        progressState ? (
+          <Loading />
+        ) : (
+          <div>
+            <div role="upload" onClick={selectFile}>
+              <input
+                type="file"
+                ref={fileInput}
+                accept=".xlsx, .xls, .csv"
+                style={{ display: "none" }}
+                id="inputfile"
+                onChange={onImportExcel}
+              />
+              <Button color="primary">点击开始导入文件</Button>
+            </div>
+            <p
+              style={{
+                paddingTop: "10px",
+                fontSize: "12px",
+                textAlign: "center",
+                color: "GrayText",
+              }}
+            >
+              仅支持 .xlsx .xls .csv
+            </p>
+            <div
+              style={{
+                textAlign: "center",
+                fontSize: "12px",
+                color: "#7b67ee",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                window.open("https://bbs.vika.cn/article/144", "_blank");
+              }}
+            >
+              查看教程
+            </div>
+          </div>
+        )
       ) : (
         <div>
-          <div role="upload" onClick={selectFile}>
-            <input
-              type="file"
-              ref={fileInput}
-              accept=".xlsx, .xls, .csv"
-              style={{ display: "none" }}
-              id="inputfile"
-              onChange={onImportExcel}
-            />
-            <Button color="primary">点击开始导入文件</Button>
-          </div>
-          <p
-            style={{
-              paddingTop: "10px",
-              fontSize: "12px",
-              textAlign: "center",
-              color: "GrayText",
-            }}
-          >
-            仅支持 .xlsx .xls .csv
-          </p>
+          <Button variant="jelly" color="primary" size="middle" disabled>
+            维格表权限为只读，无法进行写入操作
+          </Button>
           <div
             style={{
+              paddingTop: "10px",
               textAlign: "center",
               fontSize: "12px",
               color: "#7b67ee",
