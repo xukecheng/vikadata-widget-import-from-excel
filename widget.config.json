@@ -17,5 +17,6 @@
     "zh-CN": "支持从 .xlsx .xls .csv 文件中获取数据，并追加导入到当前维格表中",
     "en-US": "Support data from .xlsx .xls .csv files, and add to the import to the current table"
   },
-  "globalPackageId": "wpkLtswE2evl5"
+  "globalPackageId": "wpkLtswE2evl5",
+  "website": "https://bbs.vika.cn/article/144"
 }
