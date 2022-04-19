@@ -1,5 +1,5 @@
 {
-  "version": "0.1.10",
+  "version": "0.1.12",
   "description": "a vika widget",
   "engines": {
     "node": ">=8.x"
