@@ -108,148 +108,150 @@ export const ExcelImport: React.FC = () => {
 
     // 以二进制方式打开文件
     fileReader.readAsBinaryString(files[0]);
-    if (mention) {
-      setProgressState(true);
-      fileReader.onload = (event) => {
-        try {
-          const target = event.target?.result;
-          // 以二进制流方式读取得到整份excel表格对象
-          const wb = XLSX.read(target, {
-            type: "binary",
-            cellText: false,
-            cellDates: false,
-          });
-          // 默认只读取第一张表;
-          const wsname = wb.SheetNames[0];
-          const ws = wb.Sheets[wsname];
-          // 利用 sheet_to_json 方法将 excel 转成 json 数据
-          const data: any[] = XLSX.utils.sheet_to_json(ws, {
-            header: 1,
-            raw: true,
-          });
-          // console.log("导入文件的原始数据：", data);
+    
+    if (!mention) return null;
+    
+    setProgressState(true);
 
-          const records: Object[] = [];
-          const header: any[] = data[0];
-          const fieldNames: any[] = fields.map((field) => field.name);
-          const intersection = fieldNames.filter(function (fieldName) {
-            return header.indexOf(fieldName) > -1;
-          });
+    fileReader.onload = (event) => {
+      try {
+        const target = event.target?.result;
+        // 以二进制流方式读取得到整份excel表格对象
+        const wb = XLSX.read(target, {
+          type: "binary",
+          cellText: false,
+          cellDates: false,
+        });
+        // 默认只读取第一张表;
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        // 利用 sheet_to_json 方法将 excel 转成 json 数据
+        const data: any[] = XLSX.utils.sheet_to_json(ws, {
+          header: 1,
+          raw: true,
+        });
+        // console.log("导入文件的原始数据：", data);
 
-          // console.log("导入文件的字段：", header);
+        const records: Object[] = [];
+        const header: any[] = data[0];
+        const fieldNames: any[] = fields.map((field) => field.name);
+        const intersection = fieldNames.filter(function (fieldName) {
+          return header.indexOf(fieldName) > -1;
+        });
 
-          if (intersection.length === 0) {
-            alert("导入文件中没有和当前表格相同的列");
-            setProgressState(false);
-            return;
-          }
+        // console.log("导入文件的字段：", header);
 
-          console.log("有交集的字段：", intersection);
-
-          data.shift();
-          if (data.length === 0) {
-            alert("导入文件的数据为空");
-            setProgressState(false);
-            return;
-          }
-
-          const newData: any[] = data.filter(function (s: any[]) {
-            return s.length != 0 && s;
-          });
-          const newDataNum = newData.length;
-
-          let bigDataWarning: Boolean =
-            newDataNum > 10000
-              ? confirm(
-                  "请注意：当前导入的数据量较大，同步过程中容易导致维格表出现卡顿、同步慢等情况，情况程度视设备及网络情况而定"
-                )
-              : true;
-
-          if (bigDataWarning) {
-            // 定义数据处理方式
-            const handleDateTimeType = (data: any) => format(data);
-            const handleCheckboxType = (data: any) =>
-              data === 1 || data === true ? true : false;
-            const handleMultiSelectType = (data: any) =>
-              String(data).split(",");
-            const handleCurrencyType = (data: any) => {
-              // 避免源数据中含有货币符号
-              return typeof data != "number"
-                ? Number(data.match(/-?[0-9]+(.[0-9]+)?/)[0])
-                : data;
-            };
-            const handlePercentType = (data: any) => {
-              // 百分比类型字段处理
-              return typeof data === "number"
-                ? data
-                : data.match("%")
-                ? Number(data.match(/-?[0-9]+(.[0-9]+)?/)[0])
-                : Number(data.match(/-?[0-9]+(.[0-9]+)?/)[0]) * 100;
-            };
-            const handleNumberType = (data: any) => {
-              // 数字类型字段处理
-              return typeof data === "number"
-                ? data
-                : Number(data.match(/-?[0-9]+(.[0-9]+)?/)[0]);
-            };
-
-            // 定义数据处理映射
-            let fieldHandle = {
-              DateTime: handleDateTimeType,
-              Number: handleNumberType,
-              Checkbox: handleCheckboxType,
-              MultiSelect: handleMultiSelectType,
-              Currency: handleCurrencyType,
-              Percent: handlePercentType,
-              Rating: handleNumberType,
-            };
-
-            newData.forEach((record: any[]) => {
-              const valuesMap = new Object();
-
-              fields.map((field) => {
-                const specialType = ["Attachment", "Member", "MagicLink"];
-
-                if (field.isComputed || specialType.includes(field.type))
-                  return;
-
-                // 找出维格表每个字段在导入的文件里是什么位置
-                const index: number = header.indexOf(field.name);
-
-                if (index === -1) return;
-                try {
-                  let handleType = fieldHandle[field.type];
-                  var parseData =
-                    !String(record[index]) ||
-                    String(record[index]) === "undefined"
-                      ? null
-                      : field.type in fieldHandle
-                      ? handleType(record[index])
-                      : String(record[index]);
-                  if (typeof parseData === "number" && isNaN(parseData)) {
-                    parseData = null;
-                  }
-                  valuesMap[field.id] = parseData;
-                } catch (error) {
-                  valuesMap[field.id] = null;
-                }
-              });
-              records.push({ valuesMap });
-            });
-            // console.log(records);
-            addRecords(records);
-          } else {
-            setProgressState(false);
-            return;
-          }
-        } catch (e) {
-          console.log(e);
-          alert(e);
+        if (intersection.length === 0) {
+          alert("导入文件中没有和当前表格相同的列");
           setProgressState(false);
           return;
         }
-      };
-    }
+
+        console.log("有交集的字段：", intersection);
+
+        data.shift();
+        if (data.length === 0) {
+          alert("导入文件的数据为空");
+          setProgressState(false);
+          return;
+        }
+
+        const newData: any[] = data.filter(function (s: any[]) {
+          return s.length != 0 && s;
+        });
+        const newDataNum = newData.length;
+
+        let bigDataWarning: Boolean =
+          newDataNum > 10000
+            ? confirm(
+                "请注意：当前导入的数据量较大，同步过程中容易导致维格表出现卡顿、同步慢等情况，情况程度视设备及网络情况而定"
+              )
+            : true;
+
+        if (bigDataWarning) {
+          // 定义数据处理方式
+          const handleDateTimeType = (data: any) => format(data);
+          const handleCheckboxType = (data: any) =>
+            data === 1 || data === true ? true : false;
+          const handleMultiSelectType = (data: any) =>
+            String(data).split(",");
+          const handleCurrencyType = (data: any) => {
+            // 避免源数据中含有货币符号
+            return typeof data != "number"
+              ? Number(data.match(/-?[0-9]+(.[0-9]+)?/)[0])
+              : data;
+          };
+          const handlePercentType = (data: any) => {
+            // 百分比类型字段处理
+            return typeof data === "number"
+              ? data
+              : data.match("%")
+              ? Number(data.match(/-?[0-9]+(.[0-9]+)?/)[0])
+              : Number(data.match(/-?[0-9]+(.[0-9]+)?/)[0]) * 100;
+          };
+          const handleNumberType = (data: any) => {
+            // 数字类型字段处理
+            return typeof data === "number"
+              ? data
+              : Number(data.match(/-?[0-9]+(.[0-9]+)?/)[0]);
+          };
+
+          // 定义数据处理映射
+          let fieldHandle = {
+            DateTime: handleDateTimeType,
+            Number: handleNumberType,
+            Checkbox: handleCheckboxType,
+            MultiSelect: handleMultiSelectType,
+            Currency: handleCurrencyType,
+            Percent: handlePercentType,
+            Rating: handleNumberType,
+          };
+
+          newData.forEach((record: any[]) => {
+            const valuesMap = new Object();
+
+            fields.map((field) => {
+              const specialType = ["Attachment", "Member", "MagicLink"];
+
+              if (field.isComputed || specialType.includes(field.type))
+                return;
+
+              // 找出维格表每个字段在导入的文件里是什么位置
+              const index: number = header.indexOf(field.name);
+
+              if (index === -1) return;
+              try {
+                let handleType = fieldHandle[field.type];
+                var parseData =
+                  !String(record[index]) ||
+                  String(record[index]) === "undefined"
+                    ? null
+                    : field.type in fieldHandle
+                    ? handleType(record[index])
+                    : String(record[index]);
+                if (typeof parseData === "number" && isNaN(parseData)) {
+                  parseData = null;
+                }
+                valuesMap[field.id] = parseData;
+              } catch (error) {
+                valuesMap[field.id] = null;
+              }
+            });
+            records.push({ valuesMap });
+          });
+          // console.log(records);
+          addRecords(records);
+        } else {
+          setProgressState(false);
+          return;
+        }
+      } catch (e) {
+        console.log(e);
+        alert(e);
+        setProgressState(false);
+        return;
+      }
+    };
 
     // 清空选择的文件
     fileReader.onloadend = (event) => {
